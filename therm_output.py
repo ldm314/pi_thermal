@@ -2,7 +2,8 @@ import RPi.GPIO as GPIO
 
 class ThermOutput (object):
   def __init__(self):
-    self.freq = 1.0 # 3 seconds
+    #self.freq = 0.1  
+    self.freq = 0.15  
     self.percent = 0
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
