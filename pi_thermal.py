@@ -1,5 +1,6 @@
 from pids import Pid
 import therm_sensor
+import therm_output
 
 #----------------------------------------------------------------------------
 
@@ -36,10 +37,12 @@ if __name__ == '__main__':
       self.minwhere = -10.0
       self.output = 0.0
       self.sensor = therm_sensor.ThermSensor()
+      self.pwm = therm_output.ThermOutput()
       self.where = self.sensor.degrees_c()
       self.thread = False
     def set_output(self,val):
       self.output = val
+      self.pwm.set(val)
     def measure(self):
       return self.where
     def run(self):
@@ -47,9 +50,11 @@ if __name__ == '__main__':
         self.where = self.sensor.degrees_c()
     def start(self):
       self.running = True
+      self.pwm.start()
       self.thread = Thread(target = self.run)
       self.thread.start()
     def stop(self):
+      self.pwm.stop()
       self.running = False
       self.thread.join()
 
@@ -69,7 +74,7 @@ if __name__ == '__main__':
 
   #drawing area
   prompt = " Change Setpoint:\n\n Up/Down:     5.0\n Left/Right:  1.0 \n +/-:         0.1\n\n 'q' to quit.\n\n" 
-  pad_x = 66 
+  pad_x = 63
   pad_y = 20
 
   pad = curses.newpad(pad_y,pad_x)
@@ -81,8 +86,8 @@ if __name__ == '__main__':
   therm.start()
 
   pid = Pid()
-  pid.range(-75.0, 75.0)
-  pid.tune(.8,.3,.1)
+  pid.range(0.0, 100.0)
+  pid.tune(.8,.1,.1)
   pid.set(0)
 
   start = time.time()
@@ -121,8 +126,9 @@ if __name__ == '__main__':
       target = ("%3.2f" % pid.setpoint).rjust(6)
       minwhere = ("%3.2f" % therm.minwhere).rjust(6)
       maxwhere = ("%3.2f" % therm.maxwhere).rjust(6)
-    
-      string = "%s| Current Temp: %s, Target: %s, Min: %s, Max: %s |" % (spinner.next(),current,target,minwhere,maxwhere)
+      pid_out = ("%3.2f" % pid.output).rjust(6)
+ 
+      string = "%s| Current Temp: %s, Target: %s, PWM%%: %s          |" % (spinner.next(),current,target,pid_out)
       screen.addstr(0,0,string)
       screen.addstr(1,0," " + '='*(len(string)-1))
       screen.addstr(1+pad_y,0," " + '='*(len(string)-1))
