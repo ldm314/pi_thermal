@@ -1,7 +1,7 @@
 from pids import Pid
 import therm_sensor
 import therm_output
-
+import mpx4250ap 
 #----------------------------------------------------------------------------
 
 if __name__ == '__main__':
@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
   #drawing area
   prompt = " Change Setpoint:\n\n Up/Down:     5.0\n Left/Right:  1.0 \n +/-:         0.1\n\n 'q' to quit.\n\n" 
-  pad_x = 63
+  pad_x = 67
   pad_y = 20
 
   pad = curses.newpad(pad_y,pad_x)
@@ -85,9 +85,11 @@ if __name__ == '__main__':
   therm = ThermControl()
   therm.start()
 
+  pressure = mpx4250ap.MPX4250AP()
+
   pid = Pid()
   pid.range(0.0, 100.0)
-  pid.tune(.8,.1,.1)
+  pid.tune(.5,.1,.1)
   pid.set(0)
 
   start = time.time()
@@ -127,8 +129,9 @@ if __name__ == '__main__':
       minwhere = ("%3.2f" % therm.minwhere).rjust(6)
       maxwhere = ("%3.2f" % therm.maxwhere).rjust(6)
       pid_out = ("%3.2f" % pid.output).rjust(6)
+      kpa = ("%3.2f" % pressure.getKpa()).rjust(6)
  
-      string = "%s| Current Temp: %s, Target: %s, PWM%%: %s          |" % (spinner.next(),current,target,pid_out)
+      string = "%s| Current Temp: %s, Target: %s, PWM%%: %s, kPa: %s |" % (spinner.next(),current,target,pid_out,kpa)
       screen.addstr(0,0,string)
       screen.addstr(1,0," " + '='*(len(string)-1))
       screen.addstr(1+pad_y,0," " + '='*(len(string)-1))
