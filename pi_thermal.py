@@ -1,7 +1,7 @@
 from pids import Pid
 import therm_sensor
 import therm_output
-import mpx4250ap 
+import mpx4250dp 
 #----------------------------------------------------------------------------
 
 if __name__ == '__main__':
@@ -85,7 +85,7 @@ if __name__ == '__main__':
   therm = ThermControl()
   therm.start()
 
-  pressure = mpx4250ap.MPX4250AP()
+  pressure = mpx4250dp.MPX4250DP()
 
   pid = Pid()
   pid.range(0.0, 100.0)

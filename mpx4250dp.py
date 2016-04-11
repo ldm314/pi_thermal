@@ -7,7 +7,6 @@ class MPX4250DP (object):
   def getKpa(self):
     val = self.sensor.getVolts()
     offset = 0.192
-    print "val - offset: {}".format(val - offset)
     return ((val - offset))/0.00369
 
 if __name__ == "__main__":
