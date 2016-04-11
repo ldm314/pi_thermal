@@ -2,6 +2,7 @@ from pids import Pid
 import therm_sensor
 import therm_output
 import mpx4250dp 
+
 #----------------------------------------------------------------------------
 
 if __name__ == '__main__':
@@ -63,6 +64,9 @@ if __name__ == '__main__':
   import random
   import time
   import curses
+  from logging import Logging
+
+  log = Logging("output.csv")
 
   screen = curses.initscr()
   curses.noecho()
@@ -129,7 +133,8 @@ if __name__ == '__main__':
       minwhere = ("%3.2f" % therm.minwhere).rjust(6)
       maxwhere = ("%3.2f" % therm.maxwhere).rjust(6)
       pid_out = ("%3.2f" % pid.output).rjust(6)
-      kpa = ("%3.2f" % pressure.getKpa()).rjust(6)
+      current_kpa = pressure.getKpa()
+      kpa = ("%3.2f" % current_kpa).rjust(6)
  
       string = "%s| Current Temp: %s, Target: %s, PWM%%: %s, kPa: %s |" % (spinner.next(),current,target,pid_out,kpa)
       screen.addstr(0,0,string)
@@ -139,7 +144,9 @@ if __name__ == '__main__':
       screen.refresh()
       pad.addstr(disp)
       pad.refresh(0,0,2,1,pad_y,pad_x)
- 
+
+      log.log(therm.where,pid.setpoint,current_kpa)
+
       time.sleep(0.1)
   finally:
     therm.stop()
